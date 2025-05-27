@@ -1,4 +1,4 @@
-export type IGenericResponse<T> = {
+export type IGenericResponse<T = null> = {
   statusCode: number;
   isSuccess: boolean;
   message?: string;
