@@ -32,7 +32,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         typeof message === "string"
           ? message
           : // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            ((message as any).message as string),
+            ((message as any).message?.toString() as string),
       error: `An Error for :${process.env.PORT}` + request.path,
     } as IGenericResponse);
   }
