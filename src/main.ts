@@ -21,7 +21,7 @@ async function bootstrap() {
 
   // Global Auth Guard (JWT)
   const reflector = app.get(Reflector);
-  app.useGlobalGuards(new JwtAuthGuard(reflector), new RolesGuard(reflector));
+  // app.useGlobalGuards(new JwtAuthGuard(reflector), new RolesGuard(reflector));
 
   const config = new DocumentBuilder()
     .setTitle("My API")
