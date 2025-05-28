@@ -5,6 +5,7 @@ import { GlobalExceptionFilter } from "./exceptions/globalException";
 import { ValidationPipe } from "@nestjs/common";
 import { JwtAuthGuard } from "./guards/jwtAuth.guard";
 import { RolesGuard } from "./guards/role.guard";
+import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -21,6 +22,16 @@ async function bootstrap() {
   // Global Auth Guard (JWT)
   const reflector = app.get(Reflector);
   app.useGlobalGuards(new JwtAuthGuard(reflector), new RolesGuard(reflector));
+
+  const config = new DocumentBuilder()
+    .setTitle("My API")
+    .setDescription("The API description")
+    .setVersion("1.0")
+    .addBearerAuth()
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup("api", app, document);
 
   await app.listen(process.env.PORT ?? 3000);
 }

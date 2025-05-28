@@ -1,15 +1,17 @@
-import { Body, Controller, Post } from "@nestjs/common";
-import { LoginDto } from "./authDto";
-import { AuthService } from "./auth.service";
+import { Body, Post } from "@nestjs/common";
+import { ApiController, Public } from "src/decorators/customDecorator";
 import { IApiResponse } from "src/types/commonType";
-import { Public } from "src/decorators/customDecorator";
+import { AuthService } from "./auth.service";
+import { LoginDto } from "./authDto";
+import { ApiOkResponse } from "@nestjs/swagger";
 
-@Controller("auth")
+@ApiController("auth")
 @Public()
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post("login")
+  @ApiOkResponse({ type: LoginDto })
   login(@Body() loginDto: LoginDto): IApiResponse<any> {
     const result = this.authService.login(loginDto);
     return {

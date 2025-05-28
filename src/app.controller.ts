@@ -1,11 +1,11 @@
-import { Body, Controller, Get, Post } from "@nestjs/common";
+import { Body, Get, Post } from "@nestjs/common";
 import { AppService } from "./app.service";
 import { IApiResponse } from "./types/commonType";
 import { CreateUserDto } from "./entities/TblUser.entity";
-import { Role } from "./decorators/customDecorator";
+import { ApiController, Role } from "./decorators/customDecorator";
 import { RoleEnum } from "./utils/constant";
 
-@Controller()
+@ApiController("")
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
