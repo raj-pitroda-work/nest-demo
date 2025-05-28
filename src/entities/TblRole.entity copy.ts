@@ -11,11 +11,11 @@ import { TblUser } from "./TblUser.entity";
 @Entity("tblRole", { schema: "public" })
 export class TblRole {
   @PrimaryGeneratedColumn({ type: "smallint", name: "id" })
-  id: number;
+  id!: number;
 
   @Column("character varying", { name: "name", length: 50 })
-  name: string;
+  name!: string;
 
   @OneToMany(() => TblUser, (tblUser) => tblUser.role)
-  tblUsers: TblUser[];
+  tblUsers!: TblUser[];
 }
