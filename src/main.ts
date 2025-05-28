@@ -4,6 +4,7 @@ import { ResponseInterceptor } from "./interceptors/response.interceptor";
 import { GlobalExceptionFilter } from "./exceptions/globalException";
 import { ValidationPipe } from "@nestjs/common";
 import { JwtAuthGuard } from "./guards/jwtAuth.guard";
+import { RolesGuard } from "./guards/role.guard";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -19,7 +20,7 @@ async function bootstrap() {
 
   // Global Auth Guard (JWT)
   const reflector = app.get(Reflector);
-  app.useGlobalGuards(new JwtAuthGuard(reflector));
+  app.useGlobalGuards(new JwtAuthGuard(reflector), new RolesGuard(reflector));
 
   await app.listen(process.env.PORT ?? 3000);
 }
