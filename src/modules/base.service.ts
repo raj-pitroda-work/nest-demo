@@ -2,7 +2,7 @@ import { throwCustomError } from "src/exceptions/customException";
 import { DeepPartial, ObjectLiteral, Repository } from "typeorm";
 
 export class BaseService<T extends ObjectLiteral> {
-  constructor(protected readonly repository: Repository<T>) {}
+  constructor(private readonly repository: Repository<T>) {}
 
   create = async (data: DeepPartial<T>): Promise<T> => {
     const entity = this.repository.create(data);
