@@ -8,6 +8,7 @@ import { AuthModule } from "./modules/auth/auth.module";
 import { RoleModule } from "./modules/role/role.module";
 import { UserModule } from "./modules/user/user.module";
 import { LookupModule } from "./modules/lookup/lookup.module";
+import { ParentModule } from "./modules/parent/parent.module";
 
 @Module({
   imports: [
@@ -17,10 +18,12 @@ import { LookupModule } from "./modules/lookup/lookup.module";
     TypeOrmModule.forRootAsync({
       useFactory: getDatabaseConfig,
     }),
+    LookupModule,
     AuthModule,
     RoleModule,
+
     UserModule,
-    LookupModule,
+    ParentModule,
   ],
   controllers: [AppController],
   providers: [AppService],

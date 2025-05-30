@@ -1,5 +1,5 @@
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { ObjectLiteral, Repository } from "typeorm";
 import { RoleService } from "../role/role.service";
 import { UserService } from "../user/user.service";
 import { USER_ROLE_IDS } from "src/utils/constant";
@@ -89,7 +89,7 @@ export class LookupService {
       .leftJoin(
         "tblPrescription",
         "prescription",
-        "prescription.patientId = child.id",
+        "prescription.patientId = child.id AND prescription.pediatricianId = pediatrician.id",
       )
       .where("child.parentId = :parentId", { parentId })
       .andWhere("pediatrician.roleId = :pediatricianRoleId", {
@@ -99,31 +99,35 @@ export class LookupService {
         `child.id AS "childId"`,
         `pediatrician.id AS "pediatricianId"`,
         `pediatrician.firstName || ' ' || pediatrician.lastName AS "pediatricianName"`,
-        `COUNT(prescription.id) AS "prescriptionCount"`,
+        `COUNT(DISTINCT prescription.id || '-' || pediatrician.id) AS "prescriptionCount"`,
       ])
       .groupBy("child.id")
       .addGroupBy("pediatrician.id")
       .addGroupBy("pediatrician.firstName")
       .addGroupBy("pediatrician.lastName")
       .getRawMany();
-
     const result: {
       [key: number]: {
         lookups: { value: number; label: string }[];
-        prescriptionCount: number;
+        prescriptionCount: ObjectLiteral;
       };
     } = {};
-    raw.forEach(({ childId, pediatricianId, pediatricianName }) => {
-      if (!result[childId]?.lookups) {
-        result[childId] = { lookups: [], prescriptionCount: 0 };
-      }
-      result[childId].lookups.push({
-        value: pediatricianId,
-        label: pediatricianName,
-      });
-      result[childId].prescriptionCount +=
-        result[childId].prescriptionCount || 0;
-    });
+
+    raw.forEach(
+      ({ childId, pediatricianId, pediatricianName, prescriptionCount }) => {
+        if (!result[childId]) {
+          result[childId] = { lookups: [], prescriptionCount: {} };
+        }
+        result[childId].lookups.push({
+          value: pediatricianId,
+          label: pediatricianName,
+        });
+
+        result[childId].prescriptionCount[pediatricianId] =
+          (result[childId].prescriptionCount[pediatricianId] || 0) +
+          (Number(prescriptionCount) || 0);
+      },
+    );
 
     return result;
   };

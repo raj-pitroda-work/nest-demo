@@ -94,7 +94,6 @@ export class AuthController {
         child: childrenData,
       };
       await validateDto(RegisterParentDTO, registerData);
-      console.log(childrenData, "childrenDatachildrenData");
 
       const parentFront = files["parent.frontIdentityImage"];
       const parentBack = files["parent.backIdentityImage"];

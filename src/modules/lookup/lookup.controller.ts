@@ -2,6 +2,7 @@ import { Get } from "@nestjs/common";
 import { ApiController, Public, User } from "src/decorators/customDecorator";
 import { IOption, IPromiseApiResponse } from "src/types/commonType";
 import { LookupService } from "./lookup.service";
+import { ObjectLiteral } from "typeorm";
 
 @ApiController("lookup")
 export class LookupController {
@@ -48,7 +49,7 @@ export class LookupController {
         value: number;
         label: string;
       }[];
-      prescriptionCount: number;
+      prescriptionCount: ObjectLiteral;
     };
   }> {
     const result = await this.service.getPediatriciansLookupsByParentId(id);
