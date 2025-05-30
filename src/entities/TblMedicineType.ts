@@ -5,9 +5,9 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { TblMedicine } from "./TblMedicine";
-import { TblMedicineDosage } from "./TblMedicineDosage";
-import { TblPrescriptionMedicine } from "./TblPrescriptionMedicine";
+import { TblMedicine } from "./TblMedicine.entity";
+import { TblMedicineDosage } from "./TblMedicineDosage.entity";
+import { TblPrescriptionMedicine } from "./TblPrescriptionMedicine.entity";
 
 @Index("tblMedicineType_pkey", ["id"], { unique: true })
 @Entity("tblMedicineType", { schema: "public" })

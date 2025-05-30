@@ -6,9 +6,12 @@ import { ValidationPipe } from "@nestjs/common";
 import { JwtAuthGuard } from "./guards/jwtAuth.guard";
 import { RolesGuard } from "./guards/role.guard";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+import * as fileUpload from "express-fileupload";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  app.use(fileUpload());
 
   //validation pipe
   app.useGlobalPipes(new ValidationPipe());

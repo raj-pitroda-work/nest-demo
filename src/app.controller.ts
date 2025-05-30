@@ -1,9 +1,9 @@
 import { Body, Get, Post } from "@nestjs/common";
 import { AppService } from "./app.service";
 import { IApiResponse } from "./types/commonType";
-import { CreateUserDto } from "./entities/TblUser.entity";
 import { ApiController, Role } from "./decorators/customDecorator";
 import { RoleEnum } from "./utils/constant";
+import { CreateUserDTO } from "./modules/auth/userDTO/createUserDTO";
 
 @ApiController("")
 export class AppController {
@@ -16,7 +16,7 @@ export class AppController {
   }
 
   @Post()
-  createDemoApi(@Body() body: CreateUserDto): IApiResponse<any> {
+  createDemoApi(@Body() body: CreateUserDTO): IApiResponse<any> {
     return { data: body };
   }
 }
