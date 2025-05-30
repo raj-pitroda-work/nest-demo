@@ -7,9 +7,16 @@ import { JwtAuthGuard } from "./guards/jwtAuth.guard";
 import { RolesGuard } from "./guards/role.guard";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import * as fileUpload from "express-fileupload";
+import * as cookieParser from "cookie-parser";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  app.enableCors({
+    origin: "http://localhost:3000",
+    credentials: true, // when we need to set cookies
+  });
+  app.use(cookieParser());
 
   app.use(fileUpload());
 
@@ -35,6 +42,8 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup("api", app, document);
+
+  app.setGlobalPrefix("api");
 
   await app.listen(process.env.PORT ?? 3000);
 }

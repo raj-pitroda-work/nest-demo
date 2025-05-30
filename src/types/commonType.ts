@@ -10,3 +10,8 @@ export type IApiResponse<T = null> = Partial<IGenericResponse<T>>;
 export type IPromiseApiResponse<T = null> = Promise<
   Partial<IGenericResponse<T>>
 >;
+
+export type IOption = {
+  label: string;
+  value: number | string;
+};

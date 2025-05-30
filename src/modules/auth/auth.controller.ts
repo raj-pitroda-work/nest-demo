@@ -27,7 +27,7 @@ export class AuthController {
   async verifyOtp(
     @Res({ passthrough: true }) res: Response,
     @Body() body: VerifyLoginOtpDTO,
-  ) {
+  ): IPromiseApiResponse<{ token: string; user: TblUser }> {
     const result = await this.service.verifyOtp(body);
     res.cookie(TOKEN_VAR_ENUM.Token, result.token, {
       httpOnly: false, // If you need to access it from JS
@@ -36,10 +36,10 @@ export class AuthController {
       maxAge: 24 * 60 * 60 * 1000, //24 hours which is also expiration time of token
     });
 
-    return res.status(200).json({
+    return {
       message: msg.loginSuccess,
       data: result,
-    });
+    };
   }
 
   @Post("registerPediatrician")
@@ -84,7 +84,9 @@ export class AuthController {
       // validation start
       let childrenData = req.body?.child;
       let parentData = req.body?.parent;
-
+      if (childrenData && !Array.isArray(childrenData)) {
+        childrenData = [childrenData];
+      }
       childrenData = childrenData ? childrenData.map(JSON.parse) : undefined;
       parentData = parentData ? JSON.parse(parentData) : undefined;
       const registerData = {
@@ -92,6 +94,7 @@ export class AuthController {
         child: childrenData,
       };
       await validateDto(RegisterParentDTO, registerData);
+      console.log(childrenData, "childrenDatachildrenData");
 
       const parentFront = files["parent.frontIdentityImage"];
       const parentBack = files["parent.backIdentityImage"];

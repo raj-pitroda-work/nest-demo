@@ -1,4 +1,4 @@
-import { ParseIntPipe, Post } from "@nestjs/common";
+import { Get, ParseIntPipe } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { IPromiseApiResponse } from "src/types/commonType";
 import { TblUser } from "src/entities/TblUser.entity";
@@ -8,7 +8,7 @@ import { ApiController, User } from "src/decorators/customDecorator";
 export class UserController {
   constructor(private userService: UserService) {}
 
-  @Post("/getLoggedInUserDetails")
+  @Get("/getLoggedInUserDetails")
   async getLoggedInUserDetails(
     @User("id", ParseIntPipe) id: number,
   ): IPromiseApiResponse<TblUser> {

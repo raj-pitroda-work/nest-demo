@@ -7,6 +7,7 @@ import { getDatabaseConfig } from "./config/db.config";
 import { AuthModule } from "./modules/auth/auth.module";
 import { RoleModule } from "./modules/role/role.module";
 import { UserModule } from "./modules/user/user.module";
+import { LookupModule } from "./modules/lookup/lookup.module";
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { UserModule } from "./modules/user/user.module";
     AuthModule,
     RoleModule,
     UserModule,
+    LookupModule,
   ],
   controllers: [AppController],
   providers: [AppService],
