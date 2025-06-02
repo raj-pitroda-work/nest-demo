@@ -8,6 +8,11 @@ import { TblMedicineDosage } from "src/entities/TblMedicineDosage.entity";
 import { Injectable } from "@nestjs/common";
 import { TblPrescriptionPediatricianRejectStatus } from "src/entities/TblPrescriptionPediatricianRejectStatus.entity";
 import { TblChildren } from "src/entities/TblChildren.entity";
+import { TblPrescriptionVisitType } from "src/entities/TblPrescriptionVisitType.entity";
+import { TblPrescriptionDiagnosis } from "src/entities/TblPrescriptionDiagnosis.entity";
+import { TblPrescriptionServiceTipAccess } from "src/entities/TblPrescriptionServiceTipAccess.entity";
+import { TblPrescriptionServicePriority } from "src/entities/TblPrescriptionServicePriority.entity";
+import { TblExemption } from "src/entities/TblExemption.entity";
 
 @Injectable()
 export class LookupService {
@@ -20,6 +25,16 @@ export class LookupService {
     private medicineDosageRepo: Repository<TblMedicineDosage>,
     @InjectRepository(TblPrescriptionPediatricianRejectStatus)
     private rejectReasonRepo: Repository<TblPrescriptionPediatricianRejectStatus>,
+    @InjectRepository(TblPrescriptionVisitType)
+    private presVisitTypeRepo: Repository<TblPrescriptionVisitType>,
+    @InjectRepository(TblPrescriptionDiagnosis)
+    private presDiagnosisRepo: Repository<TblPrescriptionDiagnosis>,
+    @InjectRepository(TblPrescriptionServiceTipAccess)
+    private prescriptionServiceTipAccessRepo: Repository<TblPrescriptionServiceTipAccess>,
+    @InjectRepository(TblPrescriptionServicePriority)
+    private prescriptionServicePriorityRepo: Repository<TblPrescriptionServicePriority>,
+    @InjectRepository(TblExemption)
+    private exemptionRepo: Repository<TblPrescriptionServicePriority>,
   ) {}
   getRoles = async () => {
     return await this.roleService.repo
@@ -130,5 +145,43 @@ export class LookupService {
     );
 
     return result;
+  };
+
+  getVisitTypes = async () => {
+    return await this.presVisitTypeRepo
+      .createQueryBuilder("entity")
+      .select(["entity.visitType as label", "entity.id as value"])
+      .getRawMany();
+  };
+
+  getDiagnosis = async () => {
+    return await this.presDiagnosisRepo
+      .createQueryBuilder("entity")
+      .select([
+        `CONCAT(entity.code, ' - ', entity.name) as "label"`,
+        "entity.id as value",
+      ])
+      .getRawMany();
+  };
+
+  getPrescriptionServiceTipAccess = async () => {
+    return await this.prescriptionServiceTipAccessRepo
+      .createQueryBuilder("entity")
+      .select([`entity.name as "label"`, "entity.id as value"])
+      .getRawMany();
+  };
+
+  getPrescriptionServicePriority = async () => {
+    return await this.prescriptionServicePriorityRepo
+      .createQueryBuilder("entity")
+      .select([`entity.name as "label"`, "entity.id as value"])
+      .getRawMany();
+  };
+
+  getExemption = async () => {
+    return await this.exemptionRepo
+      .createQueryBuilder("entity")
+      // .select([`entity`, "entity.id as value"])
+      .getMany();
   };
 }

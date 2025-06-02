@@ -13,7 +13,7 @@ export class TblPrescriptionVisitType {
   @PrimaryGeneratedColumn({ type: "smallint", name: "id" })
   id!: number;
 
-  @Column("character varying", { name: "visityType" })
+  @Column("character varying", { name: "visitType" })
   visitType!: string;
 
   @OneToMany(

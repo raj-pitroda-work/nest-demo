@@ -55,4 +55,34 @@ export class LookupController {
     const result = await this.service.getPediatriciansLookupsByParentId(id);
     return { data: result };
   }
+
+  @Get("getVisitTypes")
+  async getVisitTypes(): IPromiseApiResponse<IOption[]> {
+    const result = await this.service.getVisitTypes();
+    return { data: result };
+  }
+
+  @Get("getDiagnosis")
+  async getDiagnosis(): IPromiseApiResponse<IOption[]> {
+    const result = await this.service.getDiagnosis();
+    return { data: result };
+  }
+
+  @Get("getPrescriptionServiceTipAccess")
+  async getPrescriptionServiceTipAccess(): IPromiseApiResponse<IOption[]> {
+    const result = await this.service.getPrescriptionServiceTipAccess();
+    return { data: result };
+  }
+
+  @Get("getPrescriptionServicePriority")
+  async getPrescriptionServicePriority(): IPromiseApiResponse<IOption[]> {
+    const result = await this.service.getPrescriptionServicePriority();
+    return { data: result };
+  }
+
+  @Get("getExemption")
+  async getExemption(): IPromiseApiResponse<any[]> {
+    const result = await this.service.getExemption();
+    return { data: result };
+  }
 }
