@@ -9,6 +9,12 @@ import { RoleModule } from "./modules/role/role.module";
 import { UserModule } from "./modules/user/user.module";
 import { LookupModule } from "./modules/lookup/lookup.module";
 import { ParentModule } from "./modules/parent/parent.module";
+import { PediatricianModule } from "./modules/pediatrician/pediatrician.module";
+import { MedicineModule } from "./modules/medicine/medicine.module";
+import { ChildrenModule } from "./modules/children/children.module";
+import { LaboratoryModule } from "./modules/laboratory/laboratory.module";
+import { PrescriptionModule } from "./modules/prescription/prescription.module";
+import { ServiceModule } from "./modules/service/service.module";
 
 @Module({
   imports: [
@@ -24,6 +30,12 @@ import { ParentModule } from "./modules/parent/parent.module";
 
     UserModule,
     ParentModule,
+    ChildrenModule,
+    LaboratoryModule,
+    MedicineModule,
+    PediatricianModule,
+    PrescriptionModule,
+    ServiceModule,
   ],
   controllers: [AppController],
   providers: [AppService],

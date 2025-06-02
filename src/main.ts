@@ -17,7 +17,6 @@ async function bootstrap() {
     credentials: true, // when we need to set cookies
   });
   app.use(cookieParser());
-
   app.use(fileUpload());
 
   //validation pipe

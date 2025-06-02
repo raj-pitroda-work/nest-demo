@@ -15,3 +15,18 @@ export type IOption = {
   label: string;
   value: number | string;
 };
+
+export type ITokenUser = {
+  createdAt: string;
+  dob: string;
+  email: string;
+  firstName: string;
+  id: number;
+  lastName: string;
+  otp: string;
+  otpCreatedAt: string;
+  placeOfBirthCityId: number;
+  roleId: number;
+  taxCode: string;
+  userIdentityImageId: number;
+};
