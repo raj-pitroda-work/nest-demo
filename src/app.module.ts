@@ -15,6 +15,7 @@ import { ChildrenModule } from "./modules/children/children.module";
 import { LaboratoryModule } from "./modules/laboratory/laboratory.module";
 import { PrescriptionModule } from "./modules/prescription/prescription.module";
 import { ServiceModule } from "./modules/service/service.module";
+import { PatientExemptionModule } from "./modules/ptExemption/ptExemption.module";
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { ServiceModule } from "./modules/service/service.module";
     PediatricianModule,
     PrescriptionModule,
     ServiceModule,
+    PatientExemptionModule,
   ],
   controllers: [AppController],
   providers: [AppService],

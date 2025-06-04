@@ -107,8 +107,8 @@ export class TblPrescription {
   @JoinColumn([{ name: "statusId", referencedColumnName: "id" }])
   status!: TblPrescriptionStatus;
 
-  @Column({ type: "smallint", name: "visitTypeId" })
-  visitTypeId!: number;
+  @Column({ type: "smallint", name: "visitTypeId", nullable: true })
+  visitTypeId: number;
   @ManyToOne(
     () => TblPrescriptionVisitType,
     (tblPrescriptionVisitType) => tblPrescriptionVisitType.prescriptions,

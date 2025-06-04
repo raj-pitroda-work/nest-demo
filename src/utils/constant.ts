@@ -37,3 +37,5 @@ export const PRESCRIPTION_STATUS_ENUM = {
 
 export const MAX_MED_COUNT_ALLOWED = 2;
 export const MAX_LAB_SER_COUNT_ALLOWED = 2;
+
+export const BE_DATE_FORMAT = "DD/MM/YYYY";

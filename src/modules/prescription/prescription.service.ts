@@ -24,7 +24,11 @@ export class PrescriptionService extends BaseService<TblPrescription> {
         "file",
         "file.prescriptionId = pres.id",
       )
-      .leftJoin("tblPatientExemption", "pex", "pex.patientId = pt.id")
+      .leftJoin(
+        "tblPatientExemption",
+        "pex",
+        "pex.patientId = pt.id AND  CURRENT_DATE < pex.endDate",
+      )
       .leftJoin("tblExemption", "ex", "ex.id = pex.exemptionId")
       .where("pres.id = :id", { id: prescriptionId })
       .select([

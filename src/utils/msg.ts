@@ -29,4 +29,5 @@ export const msg = {
   failToGenBarcode: "Failed to generate barcode",
   prescriptionSaveSuccess: "Prescription saved successfully",
   registerSuccess: "Register Successfully.",
+  ptExemptionCreateSuccess: "Patient exemption created successfully.",
 };
