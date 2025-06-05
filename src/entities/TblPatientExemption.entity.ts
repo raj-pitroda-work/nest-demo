@@ -4,10 +4,14 @@ import {
   Index,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { TblChildren } from "./TblChildren.entity";
 import { TblExemption } from "./TblExemption.entity";
+import { TblPrescriptionService } from "./TblPrescriptionService.entity";
+import { TblPrescriptionLaboratory } from "./TblPrescriptionLaboratory.entity";
+import { TblPrescriptionMedicine } from "./TblPrescriptionMedicine.entity";
 @Index("tblPatientExemption_pkey", ["id"], { unique: true })
 @Entity("tblPatientExemption", { schema: "public" })
 export class TblPatientExemption {
@@ -39,4 +43,22 @@ export class TblPatientExemption {
   @ManyToOne(() => TblChildren, (tblChildren) => tblChildren.patientExemptions)
   @JoinColumn([{ name: "patientId", referencedColumnName: "id" }])
   patient!: TblChildren;
+
+  @OneToMany(
+    () => TblPrescriptionService,
+    (tblPrescriptionService) => tblPrescriptionService.patientExemption,
+  )
+  prescriptionServices!: TblPrescriptionService[];
+
+  @OneToMany(
+    () => TblPrescriptionLaboratory,
+    (tblPrescriptionLaboratory) => tblPrescriptionLaboratory.patientExemption,
+  )
+  prescriptionLaboratories!: TblPrescriptionLaboratory[];
+
+  @OneToMany(
+    () => TblPrescriptionMedicine,
+    (tblPrescriptionMedicine) => tblPrescriptionMedicine.patientExemption,
+  )
+  tblPrescriptionMedicines!: TblPrescriptionMedicine[];
 }

@@ -6,12 +6,12 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { TblExemption } from "./TblExemption.entity";
 import { TblLaboratory } from "./TblLaboratory.entity";
 import { TblPediatricianSubPrescription } from "./TblPediatricianSubPrescription.entity";
 import { TblPrescriptionServicePriority } from "./TblPrescriptionServicePriority.entity";
 import { TblPrescriptionServiceTipAccess } from "./TblPrescriptionServiceTipAccess.entity";
 import { TblBranch } from "./TblBranch.entity";
+import { TblPatientExemption } from "./TblPatientExemption.entity";
 
 @Index("tblPrescriptionLaboratory_pkey", ["id"], { unique: true })
 @Entity("tblPrescriptionLaboratory", { schema: "public" })
@@ -31,14 +31,14 @@ export class TblPrescriptionLaboratory {
   @Column("boolean", { name: "isSuggestedPrescription", nullable: true })
   isSuggestedPrescription?: boolean | null;
 
-  @Column("smallint", { name: "exemptionId" })
-  exemptionId!: number;
+  @Column("smallint", { name: "patientExemptionId" })
+  patientExemptionId!: number;
   @ManyToOne(
-    () => TblExemption,
-    (tblExemption) => tblExemption.prescriptionLaboratories,
+    () => TblPatientExemption,
+    (tblPatientExemption) => tblPatientExemption.prescriptionLaboratories,
   )
-  @JoinColumn([{ name: "exemptionId", referencedColumnName: "id" }])
-  exemption!: TblExemption;
+  @JoinColumn([{ name: "patientExemptionId", referencedColumnName: "id" }])
+  patientExemption!: TblPatientExemption;
 
   @Column("integer", { name: "laboratoryId" })
   laboratoryId!: number;

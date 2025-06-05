@@ -1,8 +1,5 @@
 import { Column, Entity, Index, OneToMany } from "typeorm";
 import { TblPatientExemption } from "./TblPatientExemption.entity";
-import { TblPrescriptionLaboratory } from "./TblPrescriptionLaboratory.entity";
-import { TblPrescriptionMedicine } from "./TblPrescriptionMedicine.entity";
-import { TblPrescriptionService } from "./TblPrescriptionService.entity";
 
 @Index("tblExemption_pkey", ["id"], { unique: true })
 @Entity("tblExemption", { schema: "public" })
@@ -27,22 +24,4 @@ export class TblExemption {
     (tblPatientExemption) => tblPatientExemption.exemption,
   )
   patientExemptions!: TblPatientExemption[];
-
-  @OneToMany(
-    () => TblPrescriptionLaboratory,
-    (tblPrescriptionLaboratory) => tblPrescriptionLaboratory.exemption,
-  )
-  prescriptionLaboratories!: TblPrescriptionLaboratory[];
-
-  @OneToMany(
-    () => TblPrescriptionMedicine,
-    (tblPrescriptionMedicine) => tblPrescriptionMedicine.exemption,
-  )
-  tblPrescriptionMedicines!: TblPrescriptionMedicine[];
-
-  @OneToMany(
-    () => TblPrescriptionService,
-    (tblPrescriptionService) => tblPrescriptionService.exemption,
-  )
-  prescriptionServices!: TblPrescriptionService[];
 }

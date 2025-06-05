@@ -65,7 +65,7 @@ export class TblPrescription {
   @JoinColumn([{ name: "pediatricianId", referencedColumnName: "id" }])
   pediatrician!: TblUser;
 
-  @Column({ type: "smallint", name: "diagnosisId" })
+  @Column({ type: "smallint", name: "diagnosisId", nullable: true })
   diagnosisId?: number;
 
   @ManyToOne(

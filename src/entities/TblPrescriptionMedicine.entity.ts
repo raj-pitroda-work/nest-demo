@@ -6,11 +6,11 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { TblExemption } from "./TblExemption.entity";
 import { TblMedicine } from "./TblMedicine.entity";
 import { TblMedicineDosage } from "./TblMedicineDosage.entity";
 import { TblPediatricianSubPrescription } from "./TblPediatricianSubPrescription.entity";
 import { TblMedicineType } from "./TblMedicineType.entity";
+import { TblPatientExemption } from "./TblPatientExemption.entity";
 
 @Index("tblPrescriptionMedicine_pkey", ["id"], { unique: true })
 @Entity("tblPrescriptionMedicine", { schema: "public" })
@@ -34,14 +34,14 @@ export class TblPrescriptionMedicine {
   })
   irReplaceableReason?: string;
 
-  @Column("smallint", { name: "exemptionId" })
-  exemptionId!: number;
+  @Column("smallint", { name: "patientExemptionId" })
+  patientExemptionId!: number;
   @ManyToOne(
-    () => TblExemption,
-    (tblExemption) => tblExemption.patientExemptions,
+    () => TblPatientExemption,
+    (tblPatientExemption) => tblPatientExemption.tblPrescriptionMedicines,
   )
-  @JoinColumn([{ name: "exemptionId", referencedColumnName: "id" }])
-  exemption!: TblExemption;
+  @JoinColumn([{ name: "patientExemptionId", referencedColumnName: "id" }])
+  patientExemption!: TblPatientExemption;
 
   @Column("smallint", { name: "medicineDosageId" })
   medicineDosageId!: number;

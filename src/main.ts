@@ -20,7 +20,7 @@ async function bootstrap() {
   app.use(fileUpload());
 
   //validation pipe
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
 
   // Global Exceptions Filter
   app.useGlobalFilters(new GlobalExceptionFilter());
