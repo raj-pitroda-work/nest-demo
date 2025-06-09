@@ -68,6 +68,9 @@ export class TblPrescription {
   @Column({ type: "smallint", name: "diagnosisId", nullable: true })
   diagnosisId?: number;
 
+  @Column("character varying", { name: "pediaNote", length: 250 })
+  pediaNote: string;
+
   @ManyToOne(
     () => TblPrescriptionDiagnosis,
     (tblPrescriptionDiagnosis) => tblPrescriptionDiagnosis.prescriptions,

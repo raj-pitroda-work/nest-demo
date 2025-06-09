@@ -3,7 +3,10 @@ import { ApiController, User } from "src/decorators/customDecorator";
 import { IPromiseApiResponse, ITokenUser } from "src/types/commonType";
 import { msg } from "src/utils/msg";
 import { PediatricianService } from "./pediatrician.service";
-import { CreateElWhitePrescriptionDTO } from "./pediatricianDto/elWhitePrescriptionDTO";
+import {
+  CreateElPrescriptionDTO,
+  CreateElWhitePrescriptionDTO,
+} from "./pediatricianDto/elWhitePrescriptionDTO";
 import { RejectPrescriptionDTO } from "./pediatricianDto/rejectPrescriptionDTO";
 
 @ApiController("pediatrician")
@@ -77,6 +80,15 @@ export class PediatricianController {
     @User() user: ITokenUser,
   ): IPromiseApiResponse<any> {
     const result = await this.service.createElWhitePrescription(body, user!);
+    return { data: result, message: msg.prescriptionSaveSuccess };
+  }
+
+  @Post("createElPrescription")
+  async createElPrescription(
+    @Body() body: CreateElPrescriptionDTO,
+    @User() user: ITokenUser,
+  ): IPromiseApiResponse<any> {
+    const result = await this.service.createElPrescription(body, user!);
     return { data: result, message: msg.prescriptionSaveSuccess };
   }
 }

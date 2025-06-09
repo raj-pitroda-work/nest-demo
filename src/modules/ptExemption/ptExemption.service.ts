@@ -25,7 +25,6 @@ export class PtExemptionService extends BaseService<TblPatientExemption> {
         `CONCAT(exemption.name, ' - ', exemption.code) as label`,
       ])
       .getRawMany();
-    console.log("exemptions", exemptions);
 
     return exemptions;
   };

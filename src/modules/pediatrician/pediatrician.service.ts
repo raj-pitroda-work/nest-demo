@@ -11,13 +11,17 @@ import { TblMedicine } from "src/entities/TblMedicine.entity";
 import { TblService } from "src/entities/TblService.entity";
 import { TblLaboratory } from "src/entities/TblLaboratory.entity";
 import {
+  CreateElPrescriptionDTO,
+  CreateElPrescriptionLabDTO,
+  CreateElPrescriptionMedDTO,
+  CreateElPrescriptionServiceDTO,
   CreateElWhitePrescriptionDTO,
   CreateElWhitePrescriptionLabDTO,
   CreateElWhitePrescriptionMedDTO,
   CreateElWhitePrescriptionServiceDTO,
 } from "./pediatricianDto/elWhitePrescriptionDTO";
 import { ITokenUser } from "src/types/commonType";
-import { DataSource } from "typeorm";
+import { DataSource, QueryRunner } from "typeorm";
 import { TblPediatricianSubPrescription } from "src/entities/TblPediatricianSubPrescription.entity";
 import { TblPrescriptionMedicine } from "src/entities/TblPrescriptionMedicine.entity";
 import { TblPrescriptionLaboratory } from "src/entities/TblPrescriptionLaboratory.entity";
@@ -37,6 +41,10 @@ import {
 } from "src/utils/helperFun";
 import { ChildrenService } from "../children/children.service";
 
+type IServiceNLabType = {
+  type: "lab" | "service";
+  data: CreateElPrescriptionServiceDTO | CreateElPrescriptionLabDTO;
+};
 @Injectable()
 export class PediatricianService {
   constructor(
@@ -215,28 +223,17 @@ export class PediatricianService {
         const medAsPerType = this.getMedAsPerType(medicine);
         for (const x of Object.keys(medAsPerType)) {
           const medArr = medAsPerType[Number(x)];
-          for (let i = 0; i < medArr.length; i += MAX_MED_COUNT_ALLOWED) {
-            let chunkMedArr = medArr.slice(i, i + MAX_MED_COUNT_ALLOWED);
-            const newSubPrescription = new TblPediatricianSubPrescription({
-              isForMedicine: true,
-              prescriptionId: prescriptionId,
-              pediatricianId: exPrescription.pediatricianId,
-            });
-            const newPresResult =
-              await queryRunner.manager.save(newSubPrescription);
-            chunkMedArr = chunkMedArr.map(
-              (x) =>
-                new TblPrescriptionMedicine({
-                  ...x,
-                  subPrescriptionId: newPresResult.id,
-                }),
-            );
-
-            await queryRunner.manager.save(chunkMedArr);
-          }
+          await this.createBulkMedForPrescription(
+            queryRunner,
+            medArr,
+            prescriptionId,
+            exPrescription.pediatricianId,
+          );
         }
+      }
 
-        // save service and lab
+      // save service and lab
+      if (service?.length || laboratory?.length) {
         const serNLabArr: {
           type: "lab" | "service";
           data:
@@ -252,45 +249,12 @@ export class PediatricianService {
           serNLabArr.push(
             ...service.map((srv) => ({ type: "service" as any, data: srv })),
           );
-
-        for (let i = 0; i < serNLabArr.length; i += MAX_LAB_SER_COUNT_ALLOWED) {
-          const chunkSerLabArr = serNLabArr.slice(
-            i,
-            i + MAX_LAB_SER_COUNT_ALLOWED,
-          );
-
-          const newSubPrescription = new TblPediatricianSubPrescription({
-            isForLab: chunkSerLabArr.find((x) => x.type === "lab")
-              ? true
-              : false,
-            isForService: chunkSerLabArr.find((x) => x.type === "service")
-              ? true
-              : false,
-            prescriptionId,
-            pediatricianId: exPrescription.pediatricianId,
-          });
-
-          const newPresResult =
-            await queryRunner.manager.save(newSubPrescription);
-
-          for (const item of chunkSerLabArr) {
-            if (item.type === "lab") {
-              const labEntity = new TblPrescriptionLaboratory({
-                ...item.data,
-                laboratoryId: item.data.id,
-                subPrescriptionId: newPresResult.id,
-              });
-              await queryRunner.manager.save(labEntity);
-            } else {
-              const serviceEntity = new TblPrescriptionService({
-                ...item.data,
-                serviceId: item.data.id,
-                subPrescriptionId: newPresResult.id,
-              });
-              await queryRunner.manager.save(serviceEntity);
-            }
-          }
-        }
+        await this.createBulkServiceLabForPrescription(
+          queryRunner,
+          serNLabArr as any,
+          prescriptionId,
+          exPrescription.pediatricianId,
+        );
       }
 
       // create pdf
@@ -319,10 +283,12 @@ export class PediatricianService {
           statusId: PRESCRIPTION_STATUS_ID.PR04,
           updatedAt: new Date(),
           prescribedPrescriptionFileId: prescribedPresResult.id,
+          isElectronicWhite: true,
+          pediaNote: data.note,
         }),
       );
 
-      // await queryRunner.commitTransaction();
+      await queryRunner.commitTransaction();
       await queryRunner.release();
       return {
         prescription: exPrescription,
@@ -332,6 +298,192 @@ export class PediatricianService {
       await queryRunner.rollbackTransaction();
       await queryRunner.release();
       throwCustomError(error);
+    }
+  };
+
+  createElPrescription = async (
+    data: CreateElPrescriptionDTO,
+    drData: ITokenUser,
+  ) => {
+    const { laboratory, medicine, service, prescriptionId } = data;
+    const exPrescription =
+      await this.prescriptionService.prescriptionRepo.findOneOrFail({
+        where: { id: prescriptionId },
+      });
+
+    const ptDetail = await this.childService.childRepo.findOneOrFail({
+      where: { id: exPrescription.patientId },
+    });
+
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.startTransaction();
+    try {
+      // Save Medicine
+      if (medicine?.length) {
+        const medAsPerType = this.getMedAsPerType(medicine);
+        for (const y of Object.keys(medAsPerType)) {
+          const medAsPerExemptionWise = this.getMedAsPerExemption(
+            medAsPerType[Number(y)],
+          );
+
+          for (const x of Object.keys(medAsPerExemptionWise)) {
+            const medArr: TblPrescriptionMedicine[] =
+              medAsPerExemptionWise[Number(x) ? Number(x) : x];
+
+            await this.createBulkMedForPrescription(
+              queryRunner,
+              medArr,
+              prescriptionId,
+              exPrescription.pediatricianId,
+            );
+          }
+        }
+      }
+
+      // save service and lab
+      if (service?.length || laboratory?.length) {
+        const serNLabArr: IServiceNLabType[] = [];
+
+        if (laboratory?.length) {
+          serNLabArr.push(
+            ...laboratory.map((lab) => ({ type: "lab" as any, data: lab })),
+          );
+        }
+        if (service?.length) {
+          serNLabArr.push(
+            ...service.map((srv) => ({ type: "service" as any, data: srv })),
+          );
+        }
+
+        const serviceNLabsAsPerExWise =
+          this.getLabNServiceAsPerExemption(serNLabArr);
+        for (const x of Object.keys(serviceNLabsAsPerExWise)) {
+          const serviceNLabsAsPerExWiseSubArr: IServiceNLabType[] =
+            serviceNLabsAsPerExWise[Number(x) ? +x : x];
+          await this.createBulkServiceLabForPrescription(
+            queryRunner,
+            serviceNLabsAsPerExWiseSubArr,
+            prescriptionId,
+            exPrescription.pediatricianId,
+          );
+        }
+      }
+
+      // create pdf
+      const { barcodeBase64, prescribePrescriptionPdfBase64, uniqueName } =
+        await this.getPrescribedPrescriptionBase64(
+          exPrescription,
+          data,
+          ptDetail,
+          drData,
+        );
+
+      const newPrescribedPrescriptionDetail = new TblPrescribedPrescriptionFile(
+        {
+          name: uniqueName,
+          base64: prescribePrescriptionPdfBase64,
+          barcodeBase64,
+          uniqueString: uniqueName,
+        },
+      );
+      const prescribedPresResult = await queryRunner.manager.save(
+        newPrescribedPrescriptionDetail,
+      );
+      await queryRunner.manager.save(
+        new TblPrescription({
+          ...exPrescription,
+          diagnosisId: data.diagnosisId,
+          visitTypeId: data.visitTypeId,
+          isDarkPatientData: data.isDarkPatientData,
+          statusId: PRESCRIPTION_STATUS_ID.PR04,
+          updatedAt: new Date(),
+          prescribedPrescriptionFileId: prescribedPresResult.id,
+          pediaNote: data.note,
+        }),
+      );
+
+      await queryRunner.commitTransaction();
+      await queryRunner.release();
+      return {
+        prescription: exPrescription,
+        generatedPrescriptionBase64: prescribePrescriptionPdfBase64,
+      };
+    } catch (error: any) {
+      await queryRunner.rollbackTransaction();
+      await queryRunner.release();
+      throwCustomError(error);
+    }
+  };
+
+  private createBulkServiceLabForPrescription = async (
+    queryRunner: QueryRunner,
+    serviceLabArr: IServiceNLabType[],
+    prescriptionId: number,
+    pediatricianId: number,
+  ) => {
+    for (let i = 0; i < serviceLabArr.length; i += MAX_LAB_SER_COUNT_ALLOWED) {
+      const chunkSerLabArr = serviceLabArr.slice(
+        i,
+        i + MAX_LAB_SER_COUNT_ALLOWED,
+      );
+
+      const newSubPrescription = new TblPediatricianSubPrescription({
+        isForLab: chunkSerLabArr.find((x) => x.type === "lab") ? true : false,
+        isForService: chunkSerLabArr.find((x) => x.type === "service")
+          ? true
+          : false,
+        prescriptionId,
+        pediatricianId: pediatricianId,
+      });
+
+      const newPresResult = await queryRunner.manager.save(newSubPrescription);
+
+      for (const item of chunkSerLabArr) {
+        if (item.type === "lab") {
+          const labEntity = new TblPrescriptionLaboratory({
+            ...item.data,
+            patientExemptionId: item.data.exemptionId,
+            laboratoryId: item.data.id,
+            subPrescriptionId: newPresResult.id,
+          });
+
+          await queryRunner.manager.save(labEntity);
+        } else {
+          const serviceEntity = new TblPrescriptionService({
+            ...item.data,
+            patientExemptionId: item.data.exemptionId,
+            serviceId: item.data.id,
+            subPrescriptionId: newPresResult.id,
+          });
+          await queryRunner.manager.save(serviceEntity);
+        }
+      }
+    }
+  };
+
+  private createBulkMedForPrescription = async (
+    queryRunner: QueryRunner,
+    medArr: TblPrescriptionMedicine[],
+    prescriptionId: number,
+    pediatricianId: number,
+  ) => {
+    for (let i = 0; i < medArr.length; i += MAX_MED_COUNT_ALLOWED) {
+      let chunkMedArr = medArr.slice(i, i + MAX_MED_COUNT_ALLOWED);
+      const newSubPrescription = new TblPediatricianSubPrescription({
+        isForMedicine: true,
+        prescriptionId: prescriptionId,
+        pediatricianId: pediatricianId,
+      });
+      const newPresResult = await queryRunner.manager.save(newSubPrescription);
+
+      chunkMedArr = chunkMedArr.map(
+        (x) =>
+          new TblPrescriptionMedicine({
+            ...x,
+            subPrescriptionId: newPresResult.id,
+          }),
+      );
+      await queryRunner.manager.save(chunkMedArr);
     }
   };
 
@@ -388,7 +540,6 @@ export class PediatricianService {
     );
 
     const uniqueName = `${ptDetail.firstName}-${ptDetail.lastName}-${exPrescription.id}`;
-    console.log(uniqueName, "uniqueNameuniqueNameuniqueName");
 
     const barcodeBase64 = await generateBarcodeBase64(
       JSON.stringify({
@@ -402,8 +553,8 @@ export class PediatricianService {
     return { prescribePrescriptionPdfBase64, barcodeBase64, uniqueName };
   };
 
-  getMedAsPerType = (
-    medicines: CreateElWhitePrescriptionMedDTO[],
+  private getMedAsPerType = (
+    medicines: CreateElPrescriptionMedDTO[] | CreateElWhitePrescriptionMedDTO[],
   ): { [key: number]: TblPrescriptionMedicine[] } => {
     const medAsPerTypeWise: {
       [key: number]: TblPrescriptionMedicine[];
@@ -414,13 +565,47 @@ export class PediatricianService {
       }
       const newMedicine = new TblPrescriptionMedicine({
         ...med,
+        patientExemptionId: (med as any).exemptionId,
         quantity: med.quantity,
         medicineDosageId: med.posologyId,
         medicineId: med.id,
         medicineTypeId: med.medicineTypeId,
+        irReplaceableReason: med.irReplaceableReason,
       });
       medAsPerTypeWise[med.medicineTypeId].push(newMedicine);
     });
     return medAsPerTypeWise;
+  };
+
+  private getMedAsPerExemption = (
+    medicines: TblPrescriptionMedicine[],
+  ): { [exemptionId: number]: TblPrescriptionMedicine[] } => {
+    const medAsPerExWise: {
+      [key: number]: TblPrescriptionMedicine[];
+    } = {};
+    medicines.forEach((med) => {
+      if (!medAsPerExWise[med.patientExemptionId]) {
+        medAsPerExWise[med.patientExemptionId] = [];
+      }
+      medAsPerExWise[med.patientExemptionId].push(med);
+    });
+    return medAsPerExWise;
+  };
+
+  private getLabNServiceAsPerExemption = (
+    payload: IServiceNLabType[],
+  ): {
+    [exemptionId: number]: IServiceNLabType[];
+  } => {
+    const labNServiceAsPerExWise: {
+      [exemptionId: number]: IServiceNLabType[];
+    } = {};
+    payload.forEach((item) => {
+      if (!labNServiceAsPerExWise[item.data.exemptionId]) {
+        labNServiceAsPerExWise[item.data.exemptionId] = [];
+      }
+      labNServiceAsPerExWise[item.data.exemptionId].push(item);
+    });
+    return labNServiceAsPerExWise;
   };
 }

@@ -1,10 +1,12 @@
 import { Type } from "class-transformer";
 import {
   IsArray,
+  IsBoolean,
   IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
+  MaxLength,
   Validate,
   ValidateNested,
   ValidationArguments,
@@ -79,6 +81,39 @@ class AtLeastOnePrescriptionConstraint implements ValidatorConstraintInterface {
   }
 }
 
+export class CreateElPrescriptionMedDTO extends CreateElWhitePrescriptionMedDTO {
+  @IsNumber()
+  @IsOptional()
+  exemptionId: number;
+
+  @IsNotEmpty()
+  isSuggestedPrescription: boolean;
+
+  @IsNotEmpty()
+  isNotReplaceable: boolean;
+
+  @IsString()
+  @IsOptional()
+  irReplaceableReason?: string;
+}
+
+export class CreateElPrescriptionServiceDTO extends CreateElWhitePrescriptionServiceDTO {
+  @IsNumber()
+  @IsOptional()
+  exemptionId: number;
+
+  @IsNotEmpty()
+  servicePriorityId: number;
+
+  @IsNotEmpty()
+  tipAccessId: number;
+
+  @IsNotEmpty()
+  isSuggestedPrescription: boolean;
+}
+
+export class CreateElPrescriptionLabDTO extends CreateElPrescriptionServiceDTO {}
+
 export class CreateElWhitePrescriptionDTO {
   @IsNumber()
   @IsNotEmpty()
@@ -105,6 +140,48 @@ export class CreateElWhitePrescriptionDTO {
   @Type(() => CreateElWhitePrescriptionLabDTO)
   @IsOptional()
   laboratory?: CreateElWhitePrescriptionLabDTO[];
+
+  @Validate(AtLeastOnePrescriptionConstraint)
+  prescriptionGroupCheck: any;
+}
+
+export class CreateElPrescriptionDTO {
+  @IsNumber()
+  @IsNotEmpty()
+  prescriptionId!: number;
+
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(255)
+  note!: string;
+
+  @IsNotEmpty()
+  diagnosisId: number;
+
+  @IsNotEmpty()
+  visitTypeId: number;
+
+  @IsBoolean()
+  @IsNotEmpty()
+  isDarkPatientData: boolean;
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateElPrescriptionMedDTO)
+  @IsOptional()
+  medicine?: CreateElPrescriptionMedDTO[];
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateElPrescriptionServiceDTO)
+  @IsOptional()
+  service?: CreateElPrescriptionServiceDTO[];
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateElPrescriptionLabDTO)
+  @IsOptional()
+  laboratory?: CreateElPrescriptionLabDTO[];
 
   @Validate(AtLeastOnePrescriptionConstraint)
   prescriptionGroupCheck: any;
