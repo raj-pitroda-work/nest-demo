@@ -71,6 +71,13 @@ export class TblPrescription {
   @Column("character varying", { name: "pediaNote", length: 250 })
   pediaNote: string;
 
+  @Column("timestamp with time zone", {
+    name: "createdAt",
+    nullable: true,
+    default: () => "CURRENT_TIMESTAMP",
+  })
+  createdAt!: Date;
+
   @ManyToOne(
     () => TblPrescriptionDiagnosis,
     (tblPrescriptionDiagnosis) => tblPrescriptionDiagnosis.prescriptions,
