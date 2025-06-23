@@ -36,6 +36,7 @@ async function bootstrap() {
     .setTitle("My API")
     .setDescription("The API description")
     .setVersion("1.0")
+    .addServer("/api")
     .addBearerAuth()
     .build();
 
