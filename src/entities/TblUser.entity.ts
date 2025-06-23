@@ -46,7 +46,7 @@ export class TblUser {
     nullable: true,
     default: () => "CURRENT_TIMESTAMP",
   })
-  createdAt!: Date | null;
+  createdAt!: Date;
 
   @Column("text", { name: "img" })
   img!: string;

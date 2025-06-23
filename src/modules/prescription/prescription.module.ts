@@ -3,9 +3,12 @@ import { PrescriptionController } from "./prescription.controller";
 import { PrescriptionService } from "./prescription.service";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { TblPrescription } from "src/entities/TblPrescription.entity";
+import { TblPrescribedPrescriptionFile } from "src/entities/TblPrescribedPrescriptionFile.entity";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([TblPrescription])],
+  imports: [
+    TypeOrmModule.forFeature([TblPrescription, TblPrescribedPrescriptionFile]),
+  ],
   controllers: [PrescriptionController],
   providers: [PrescriptionService],
   exports: [PrescriptionService],

@@ -268,7 +268,7 @@ export class PediatricianService {
 
       const newPrescribedPrescriptionDetail = new TblPrescribedPrescriptionFile(
         {
-          name: uniqueName,
+          name: uniqueName + ".pdf",
           base64: prescribePrescriptionPdfBase64,
           barcodeBase64,
           uniqueString: uniqueName,
@@ -570,7 +570,7 @@ export class PediatricianService {
         medicineDosageId: med.posologyId,
         medicineId: med.id,
         medicineTypeId: med.medicineTypeId,
-        irReplaceableReason: med.irReplaceableReason,
+        irReplaceableReason: (med as any).irReplaceableReason,
       });
       medAsPerTypeWise[med.medicineTypeId].push(newMedicine);
     });

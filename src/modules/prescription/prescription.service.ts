@@ -3,12 +3,15 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { TblPrescription } from "src/entities/TblPrescription.entity";
 import { Repository } from "typeorm";
 import { BaseService } from "../base.service";
+import { TblPrescribedPrescriptionFile } from "src/entities/TblPrescribedPrescriptionFile.entity";
 
 @Injectable()
 export class PrescriptionService extends BaseService<TblPrescription> {
   constructor(
     @InjectRepository(TblPrescription)
     public prescriptionRepo: Repository<TblPrescription>,
+    @InjectRepository(TblPrescribedPrescriptionFile)
+    public prescribedPresRepo: Repository<TblPrescribedPrescriptionFile>,
   ) {
     super(prescriptionRepo);
   }
@@ -94,5 +97,13 @@ export class PrescriptionService extends BaseService<TblPrescription> {
       return acc;
     }, {} as any);
     return prescription;
+  };
+
+  getPrescribedPrescriptionBase64 = async (id: number): Promise<string> => {
+    const prescribedPres = await this.prescribedPresRepo.findOneByOrFail({
+      id,
+    });
+
+    return prescribedPres.base64;
   };
 }

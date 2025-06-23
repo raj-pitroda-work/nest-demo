@@ -28,6 +28,7 @@ export const msg = {
   errGenPdf: "Error generating PDF",
   failToGenBarcode: "Failed to generate barcode",
   prescriptionSaveSuccess: "Prescription saved successfully",
+  recordUpdateSuccess: "Record updated successfully",
   registerSuccess: "Register Successfully.",
   ptExemptionCreateSuccess: "Patient exemption created successfully.",
 };

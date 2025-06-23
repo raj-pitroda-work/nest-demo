@@ -52,18 +52,23 @@ export const generateBarcodeBase64 = async (
   altText?: string,
   showText: boolean = false,
 ) => {
+  const opt: bwipjs.RenderOptions = {
+    bcid: "code128",
+    text: text,
+    scale: 4,
+    height: 10,
+    includetext: showText,
+    backgroundcolor: "FFFFFF",
+    paddingwidth: 4,
+    paddingtop: 2,
+    textfont: "13px",
+    textyoffset: 2,
+  };
+  if (altText) {
+    opt.alttext = altText;
+  }
   try {
-    const pngBuffer = await bwipjs.toBuffer({
-      bcid: "code128",
-      text: text,
-      scale: 3,
-      height: 10,
-      includetext: showText,
-      backgroundcolor: "FFFFFF",
-      paddingwidth: 4,
-      paddingtop: 2,
-      alttext: altText,
-    });
+    const pngBuffer = await bwipjs.toBuffer(opt);
 
     return pngBuffer.toString("base64");
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
